@@ -6,7 +6,7 @@
 #    By: wkonings <wkonings@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2023/01/16 15:30:52 by wkonings      #+#    #+#                  #
-#    Updated: 2023/01/16 15:48:50 by wkonings      ########   odam.nl          #
+#    Updated: 2023/01/18 17:55:16 by wkonings      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,9 +18,11 @@ NAME 	:= cub3d
 FLAGS 	:= #-Wall -Wextra -Werror #//todo: RENABLE FLAGS WHEN HANDING IN FOR THE LOVE OF GOD
 CFLAGS	:= -w -Wunreachable-code -Ofast
 DEBUG 	:= #-g #-fsanitize=address
-LIBS	:= libft mlx
+# LIBS	:= $(LIBMLX_A) $(LIBFT_A)
 LIBMLX	:= mlx
+LIBMLX_A:= $(LIBMLX)/libmlx42.a
 LIBFT	:= libft
+LIBFT_A	:= $(LIBFT)/libft.a
 MAKEFILE:= makefile
 
 # ---------------------------------------- #
@@ -47,7 +49,6 @@ INC			:= -I include
 # --------------- FILES ------------------- #
 # ----------------------------------------- #
 
-#this cant be fully right?
 HEADER_FILES:=	cub3d.h
 HEADERS		:=	$(addprefix $(INCLUDE_DIR)/, $(HEADER_FILES))
 
@@ -92,52 +93,53 @@ VIOLET	:= \1\33[38;5;183m\2
 # --------------- RECIPES ----------------- #
 # ----------------------------------------- #
 
-$(NAME): $(OBJS) $(HEADERS) $(MAKEFILE)
-	@make all -C $(LIB_DIR)
-	@make -C $(LIBMLX)
+$(NAME): $(LIBFT_A) $(LIBMLX_A) $(OBJS) $(HEADERS) $(MAKEFILE)
 	@printf "$(BLUE)Compiling $(YELLOW)$(NAME).\n$(END)"
 	@$(CC) -ldl -lglfw -lm $(FLAGS) $(DEBUG) $(SRCS) -o $(NAME) -I include -I mlx/include $(INCLUDES)
 	@printf "$(YELLOW)$(NAME) compiled!\n$(END)"
-	@make cubed
+# @make cubed
 
 all: $(BANNER) $(NAME)
+
+$(LIBS): $(LIBMLX_A) $(LIBFT_A)
+
+$(LIBMLX_A): $(LIBMLX)
+	@make all -C $(LIBMLX)
 
 $(LIBMLX):
 	@git clone https://github.com/codam-coding-college/MLX42.git $(LIBMLX)
 
+$(LIBFT_A): $(LIBFT)
+	@make all -C $(LIB_DIR)
+
 $(LIBFT):
 	@git clone https://github.com/shoddy42/libft
 
-# $(BIN_DIR):
-# 	@printf "$(YELLOW)Creating $(RESET)/$@/ directory.\n$(END)"
-# 	@mkdir -p $@
-
-$(OBJ_DIR)/%.o:$(SRC_DIR)/%.c | $(LIBFT) $(LIBMLX)
+$(OBJ_DIR)/%.o:$(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
 	@printf "$(YELLOW)Compiling $(PINK)$(notdir $@) $(RESET)from $(RED)$(notdir $<)$(END)\n"
 	@$(CC) $(FLAGS) -I include $(INCLUDE_READLINE) -c $< -o $@
 
-flags:
-	$(CC) $(FLAGS) $(SOURCES) -lft $(INCLUDES) -lreadline $(READLINE_DIRS) $(INCLUDE_READLINE)
-	./$(NAME)
-
 clean:
+	@printf "$(YELLOW)Cleaning up $(NAME)!\n$(END)"
 	/bin/rm -rf $(OBJ_DIR)
 
 fclean:	clean
 	/bin/rm -f $(NAME)
 	/bin/rm -rf $(BIN_DIR)
-
-mrclean: fclean
 	@make fclean -C $(LIBFT)
+	@make fclean -C $(LIBMLX)
+	@printf "$(L_BLUE)Fully cleaned $(NAME)\n$(END)"
 
-tooclean: fclean
+tooclean: clean
+	@printf "$(RED)Removing $(LIBFT)\n$(RESET)"
 	/bin/rm -rf $(LIBFT)
+	@printf "$(RED)Removing $(LIBMLX)\n$(RESET)"
 	/bin/rm -rf $(LIBMLX)
 
 re: fclean all
 
-tooreal: tooclean re
+tooreal: tooclean $(NAME)
 
 test: $(NAME)
 	@./$(NAME)
