@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/16 15:54:39 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/18 15:52:23 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/18 19:47:34 by auzochuk      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,17 @@
 # include <stdlib.h>
 # include <stdio.h> //todo: remove
 # include <fcntl.h>
-# include "libft/include/libft.h"
-# include "mlx/include/MLX42/MLX42.h"
+# include "../libft/include/libft.h"
+# include "../mlx/include/MLX42/MLX42.h"
+
+typedef	struct s_parse
+{
+	int x;
+	int y;
+	int	dx;
+	int	dy;
+}	t_parse;
+
 
 typedef	struct s_player
 {
@@ -31,13 +40,26 @@ typedef	struct s_player
 
 }	t_player;
 
+typedef struct s_map
+{
+	char		**map;
+	//Floor color
+	//Cieling color
+	//wall color
+	int			width;
+	int			height;
+}	t_map;
+
+
 typedef struct s_cub3d
 {
 	mlx_t		*mlx;
 	mlx_image_t	*img;
-
-	char		**map;
+	
+	t_map		*level;
 	t_player	*player;
+	bool		has_player;
+	
 	char		*title;
 }	t_cub3d;
 
