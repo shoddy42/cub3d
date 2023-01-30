@@ -6,7 +6,7 @@
 /*   By: auzochuk <auzochuk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/30 15:25:30 by auzochuk      #+#    #+#                 */
-/*   Updated: 2023/01/30 16:53:55 by auzochuk      ########   odam.nl         */
+/*   Updated: 2023/01/30 17:38:33 by auzochuk      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,8 +130,12 @@ bool	init_bob(t_cub3d *data)
 		{
 			if (ft_charinstr(level->map[y][x], PLAYER_TILES) == true && has_player == false)
 			{
-				//todo: set direction of player
+				//todo: set direction of player depending on NSWE
 				printf ("Player data set\n");
+				data->player->dir_x = -1;
+				data->player->dir_y = 0;
+				data->player->plane_x = 0;
+				data->player->plane_y = 0.66;
 				data->player->x = (float)x * SCALE;
 				data->player->y = (float)y * SCALE;
 				has_player = true;
