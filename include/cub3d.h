@@ -6,15 +6,18 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/16 15:54:39 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/30 19:08:05 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/30 21:47:31 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB3D_H
 # define CUB3D_H
 
-# define WIDTH 2048
+# define WIDTH 1048
 # define HEIGHT 1024
+# define SCALE 16
+# define VALID_TILES "01NSWE"
+# define PLAYER_TILES "NSWE"
 
 # include <stdbool.h>
 # include <stdlib.h>
@@ -23,8 +26,16 @@
 # define PI3 3*M_PI/2
 # include <fcntl.h>
 # include <math.h>
-# include "libft/include/libft.h"
-# include "mlx/include/MLX42/MLX42.h"
+# include "../libft/include/libft.h"
+# include "../mlx/include/MLX42/MLX42.h"
+
+typedef	struct s_parse
+{
+	int x;
+	int y;
+	int	dx;
+	int	dy;
+}	t_parse;
 
 typedef	struct s_player
 {
@@ -36,17 +47,39 @@ typedef	struct s_player
 	double	plane_y;
 }	t_player;
 
+typedef struct s_map
+{
+	char	**map;
+	//Floor color
+	//Ceiling color
+	//Wall color
+	int		width;
+	int		height;
+}	t_map;
+
 typedef struct s_cub3d
 {
 	mlx_t		*mlx;
 	mlx_image_t	*img;
-
-	char		**map;
+	
+	t_map		*level;
 	t_player	*player;
-	int			scale;
+	bool		has_player;
+	char **map;
+	int scale;
+	
 	char		*title;
 }	t_cub3d;
 
+
+void	error_exit(char *msg, int error_code);
+bool	parse_map(char *file, t_cub3d *data);
+
+
+
+
+
+//string colors
 # define YELLOW	"\1\33[38;5;220m\2"
 # define BLACK	"\1\33[38;5;232m\2"
 # define ORANGE	"\1\33[38;5;202m\2"
