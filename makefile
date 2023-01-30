@@ -6,7 +6,7 @@
 #    By: wkonings <wkonings@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2023/01/16 15:30:52 by wkonings      #+#    #+#                  #
-#    Updated: 2023/01/18 17:55:16 by wkonings      ########   odam.nl          #
+#    Updated: 2023/01/24 03:21:29 by wkonings      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@
 NAME 	:= cub3d
 FLAGS 	:= #-Wall -Wextra -Werror #//todo: RENABLE FLAGS WHEN HANDING IN FOR THE LOVE OF GOD
 CFLAGS	:= -w -Wunreachable-code -Ofast
-DEBUG 	:= #-g #-fsanitize=address
+DEBUG 	:= -g -fsanitize=address
 # LIBS	:= $(LIBMLX_A) $(LIBFT_A)
 LIBMLX	:= mlx
 LIBMLX_A:= $(LIBMLX)/libmlx42.a

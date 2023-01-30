@@ -6,29 +6,34 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/16 15:54:39 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/18 15:52:23 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/30 19:08:05 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB3D_H
 # define CUB3D_H
 
-# define WIDTH 1920
-# define HEIGHT 1080
+# define WIDTH 2048
+# define HEIGHT 1024
 
 # include <stdbool.h>
 # include <stdlib.h>
 # include <stdio.h> //todo: remove
+# define PI2 M_PI/2
+# define PI3 3*M_PI/2
 # include <fcntl.h>
+# include <math.h>
 # include "libft/include/libft.h"
 # include "mlx/include/MLX42/MLX42.h"
 
 typedef	struct s_player
 {
-	float	x;
-	float	y;
-	float	dir;
-
+	double	x;
+	double	y;
+	double	dir_x;
+	double	dir_y;
+	double	plane_x;
+	double	plane_y;
 }	t_player;
 
 typedef struct s_cub3d
@@ -38,6 +43,7 @@ typedef struct s_cub3d
 
 	char		**map;
 	t_player	*player;
+	int			scale;
 	char		*title;
 }	t_cub3d;
 
