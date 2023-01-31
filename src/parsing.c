@@ -6,7 +6,7 @@
 /*   By: auzochuk <auzochuk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/30 15:25:30 by auzochuk      #+#    #+#                 */
-/*   Updated: 2023/01/30 20:36:08 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/31 18:13:15 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,8 @@ bool	init_bob(t_cub3d *data)
 				printf ("Player data set\n");
 				data->player->dir_x = -1;
 				data->player->dir_y = 0;
+				data->player->side_dir_x = 0;
+				data->player->side_dir_y = 1;
 				data->player->plane_x = 0;
 				data->player->plane_y = 0.66;
 				data->player->x = (float)x;
