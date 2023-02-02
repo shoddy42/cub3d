@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/16 15:54:39 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/31 20:07:03 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/02 18:34:39 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # define SCALE 16
 # define texWidth 64
 # define texHeight 64
+# define CEILING 0x999999FF
 # define VALID_TILES "01NSWE"
 # define WALL_TILES "1"
 # define PLAYER_TILES "NSWE"
@@ -87,6 +88,8 @@ typedef struct s_cub3d
 	bool		has_player;
 	bool		crouching;
 	t_texture	*textures;
+	mlx_texture_t *tex;
+	mlx_texture_t *north;
 
 	// char **map;
 	// int scale;

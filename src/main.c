@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/08 19:11:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/31 20:22:55 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/02 18:42:30 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ void    bresenham(float ax, float ay, float bx, float by, t_cub3d *data, uint32_
 }
 void	draw_square(int	x, int y, t_cub3d *data, uint32_t color)
 {
-
 	int i = -1;
 	int bx = (x + 1) * SCALE - 1;
 
@@ -45,7 +44,7 @@ void	draw_square(int	x, int y, t_cub3d *data, uint32_t color)
 		bx = WIDTH / 2 - 1;
 	while (++i < SCALE - 1)
 	{
-		bresenham(x * SCALE, y * SCALE + i, bx, y * SCALE + i, data, color);
+		bresenham(WIDTH - x * SCALE, HEIGHT - y * SCALE + i, WIDTH - bx, HEIGHT - y * SCALE + i, data, color);
 	}
 }
 
@@ -58,9 +57,9 @@ void	draw_player(t_player *player, t_cub3d *data)
 	while (i < SCALE / 4)
 	{
 		i++;
-		bresenham(player->x * SCALE, player->y * SCALE + i, player->x * SCALE + (SCALE / 4), player->y * SCALE + i, data, 0xFF0000FF);
+		bresenham(WIDTH - player->x * SCALE, HEIGHT - player->y * SCALE + i,  WIDTH - player->x * SCALE + (SCALE / 4), HEIGHT - player->y * SCALE + i, data, 0xFF0000FF);
 	}
-	bresenham(player->x * SCALE, player->y * SCALE, player->x * SCALE + player->dir_x * 50, player->y * SCALE + player->dir_y * 50, data, 0x0000FFFF);
+	bresenham(WIDTH - player->x * SCALE, HEIGHT - player->y * SCALE,  WIDTH - player->x * SCALE - player->dir_x * 50, HEIGHT - player->y * SCALE - player->dir_y * 50, data, 0x0000FFFF);
 }
 
 void	draw_cursor(t_cub3d *data)
@@ -84,20 +83,20 @@ void	bad_draw(t_cub3d *data)
 	int y = -1;
 
 	ft_bzero(data->img->pixels, WIDTH * HEIGHT * sizeof(unsigned int));
-	// while (++y < data->level->height)
-	// {
-	// 	x = -1;
-	// 	while (++x < data->level->width)
-	// 	{
-	// 		// if (data->level->map[y][x] == '1')
-	// 		// 	draw_square(x, y, data, 0xFFFFFFFF);
-	// 		// else if (data->level->map[y][x] == '0')
-	// 		// 	draw_square(x, y, data, 0x999999FF);
-	// 	}
-	// }
+	while (++y < data->level->height)
+	{
+		x = -1;
+		while (++x < data->level->width)
+		{
+			if (data->level->map[y][x] == '1')
+				draw_square(x, y, data, 0xFFFFFF99);
+			else if (data->level->map[y][x] == '0')
+				draw_square(x, y, data, 0x99999999);
+		}
+	}
 	draw_cursor(data);
 	// bresenham(WIDTH / 2, 0, WIDTH / 2, HEIGHT, data, 0xFFFFFFFF);
-	// draw_player(data->player, data);
+	draw_player(data->player, data);
 }
 
 void	draw_buffer(uint32_t *buffer, int start, int end, int i, int x, t_cub3d *data)
@@ -194,11 +193,11 @@ void	draw_3d(t_cub3d *data)
 
 		draw_end += data->pitch;
 		draw_start += data->pitch;
-		if (data->crouching == true)
-		{
-			draw_end -= 100;
-			draw_start -= 100;
-		}
+		// if (data->crouching == true)
+		// {
+		// 	draw_end += 1;
+		// 	draw_start += 1;
+		// }
 		if (draw_start < 0)
 			draw_start = 0;
 		if (draw_end >= HEIGHT)
@@ -212,15 +211,23 @@ void	draw_3d(t_cub3d *data)
 			wall_x = player->x + wall_dist * ray_dir_x;
 		wall_x -= floor((wall_x));
 
-		int tex_x = (int)(wall_x * texWidth);
+		// int tex_x = (int)(wall_x * texWidth);
+		// if (side == 0 && ray_dir_x > 0)
+		// 	tex_x = texWidth - tex_x - 1;
+		// if (side == 1 && ray_dir_y < 0)
+		// 	tex_x = texWidth - tex_x - 1;
+
+		// double step = 1.0 * texHeight / line_height;
+		// double tex_pos = (draw_start - data->pitch - HEIGHT / 2 + line_height / 2) * step;
+
+		int tex_x = (int)(wall_x * data->tex->width);
 		if (side == 0 && ray_dir_x > 0)
-			tex_x = texWidth - tex_x - 1;
+			tex_x = data->tex->width - tex_x - 1;
 		if (side == 1 && ray_dir_y < 0)
-			tex_x = texWidth - tex_x - 1;
+			tex_x = data->tex->width - tex_x - 1;
 
-		double step = 1.0 * texHeight / line_height;
+		double step = 1.0 * data->tex->height / line_height;
 		double tex_pos = (draw_start - data->pitch - HEIGHT / 2 + line_height / 2) * step;
-
 
 		// if (side == 0)
 		// 	bresenham(x, draw_start, x, draw_end, data, 0x990000FF);
@@ -233,32 +240,66 @@ void	draw_3d(t_cub3d *data)
 			col = 0xFF0000FF;
 
 		// col = data->textures->tex[1][texHeight * ]
-		// if (wall_dist > 4)
-		// {
-		// 	uint32_t red;
-		// 	red = col >> 24;
-		// 	red -= (int)wall_dist * 5;
-		// 	col = red << 24;
-		// 	col += 255;
-		// 	// printf ("adj col?: %u\n", col);
-		// 	// col = col >> 16;
-		// 	// col -= (wall_dist / 10);
-		// 	// col = col << 16;
-		// }
 		int buffer_idx = -1;
-		for (int y = draw_start; y < draw_end; y++)
+		// for drawing generated textures
+		// for (int y = draw_start; y < draw_end; y++)
+		// {
+		// 	int tex_y = (int)tex_pos & (texHeight - 1);
+		// 	tex_pos += step;
+		// 	col = data->textures[5].tex[texHeight * tex_y + tex_x];
+		// 	buffer[++buffer_idx] = col;	
+		// }
+
+		//for drawing png textures
+			// pixelx = &texture->pixels[(i * texture->width) * texture->bytes_per_pixel];
+		if (side == 1)
 		{
-			int tex_y = (int)tex_pos & (texHeight - 1);
-			tex_pos += step;
-			col = data->textures[5].tex[texHeight * tex_y + tex_x];
-			buffer[++buffer_idx] = col;
-			
+			for (int y = draw_start; y < draw_end; y++)
+			{
+				int tex_y = (int)tex_pos & (int)(data->tex->pixels - 1);
+				tex_pos += step;
+				col =  (uint32_t)data->tex->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel] << 24;
+				col += (uint32_t)data->tex->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 1] << 16;
+				col += (uint32_t)data->tex->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 2] << 8;
+				col += (uint32_t)data->tex->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 3];
+				// if (side == 0)
+				// {
+				// 	// col -= 0x05050500;
+				// }
+				if (wall_dist > 4)
+				{
+					col /= 2;
+				}
+				buffer[++buffer_idx] = col;
+			}
+
 		}
-		mlx_tex
+		if (side == 0)
+		{
+			for (int y = draw_start; y < draw_end; y++)
+			{
+				int tex_y = (int)tex_pos & (int)(data->north->pixels - 1);
+				tex_pos += step;
+				col =  (uint32_t)data->north->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel] << 24;
+				col += (uint32_t)data->north->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 1] << 16;
+				col += (uint32_t)data->north->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 2] << 8;
+				col += (uint32_t)data->north->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 3];
+				// if (side == 0)
+				// {
+				// 	// col -= 0x05050500;
+				// }
+				if (wall_dist > 4)
+				{
+					col /= 2;
+				}
+				buffer[++buffer_idx] = col;
+			}
+		}
 		draw_buffer(buffer, draw_start, draw_end, buffer_idx, x, data);
 		// bresenham(x, draw_start, x, draw_end, data, col);
 		x++;
 	}
+	mlx_draw_texture(data->img, data->north, 0, 0);
 	draw_cursor(data);
 }
 
@@ -312,8 +353,6 @@ void	keyhook(mlx_key_data_t keydata, void *param)
 	{
 		data->crouching = !data->crouching;
 	}
-	// bad_draw(data);
-	// draw_3d(data);
 }
 
 void	mousehook(mouse_key_t button, action_t action, modifier_key_t mods, void *param)
@@ -378,6 +417,7 @@ void	loophook(void *param)
 	draw_3d(data);
 }
 
+//todo: maybe fall back to this if there's textures missing.
 void	generate_textures(t_cub3d *data)
 {
 	for(int x = 0; x < texWidth; x++)
@@ -400,10 +440,22 @@ void	generate_textures(t_cub3d *data)
 	}
 }
 
+bool	init_textures(t_cub3d *data)
+{
+	mlx_texture_t *test = mlx_load_png("/Users/wkonings/wkonings/cub3d/assets/redbrick.png");
+	mlx_texture_t *north = mlx_load_png("/Users/wkonings/wkonings/cub3d/assets/purplestone.png");
+	data->tex = test;
+	data->north = north;
+
+	return (true);	
+}
+
 bool	init(char **av, t_cub3d *data)
 {
 	data->mlx = mlx_init(WIDTH, HEIGHT, av[1], false);
 	mlx_set_cursor_mode(data->mlx, MLX_MOUSE_HIDDEN);
+	init_textures(data);
+
 	// mlx_set_mouse_pos(data->mlx, WIDTH / 2, HEIGHT / 2);
 	data->img = mlx_new_image(data->mlx, WIDTH, HEIGHT);
 	data->textures = ft_calloc(9, sizeof(t_texture));
