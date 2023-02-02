@@ -6,7 +6,7 @@
 /*   By: auzochuk <auzochuk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/30 15:25:30 by auzochuk      #+#    #+#                 */
-/*   Updated: 2023/01/31 18:13:15 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/02 18:53:51 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,8 +138,8 @@ bool	init_bob(t_cub3d *data)
 				data->player->side_dir_y = 1;
 				data->player->plane_x = 0;
 				data->player->plane_y = 0.66;
-				data->player->x = (float)x;
-				data->player->y = (float)y;
+				data->player->x = (float)x + 0.5f;
+				data->player->y = (float)y + 0.5f;
 				has_player = true;
 				level->map[y][x] = '0';
 			}
