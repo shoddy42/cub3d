@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/08 19:11:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/07 01:11:00 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/07 21:00:21 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void	draw_player(t_player *player, t_cub3d *data)
 	while (i < SCALE / 4)
 	{
 		i++;
-		bresenham(WIDTH - player->x * SCALE, HEIGHT - player->y * SCALE + i,  WIDTH - player->x * SCALE + (SCALE / 4), HEIGHT - player->y * SCALE + i, data, 0xFF0000FF);
+		bresenham(WIDTH - player->x * SCALE, HEIGHT - player->y * SCALE + i - 1,  WIDTH - player->x * SCALE + (SCALE / 4), HEIGHT - player->y * SCALE + i - 1, data, 0xFF0000FF);
 	}
 	bresenham(WIDTH - player->x * SCALE, HEIGHT - player->y * SCALE,  WIDTH - player->x * SCALE - player->dir_x * 50, HEIGHT - player->y * SCALE - player->dir_y * 50, data, 0x0000FFFF);
 }
@@ -82,7 +82,6 @@ void	bad_draw(t_cub3d *data)
 	int x = -1;
 	int y = -1;
 
-	//todo: change to floor and ceiling colours
 	ft_bzero(data->img->pixels, WIDTH * HEIGHT * sizeof(unsigned int));
 	while (++y < data->level->height)
 	{
@@ -96,7 +95,6 @@ void	bad_draw(t_cub3d *data)
 		}
 	}
 	draw_cursor(data);
-	// bresenham(WIDTH / 2, 0, WIDTH / 2, HEIGHT, data, 0xFFFFFFFF);
 	draw_player(data->player, data);
 }
 
@@ -125,7 +123,7 @@ void	draw_buffer(t_col *buffer, int start, int end, int i, int x, t_cub3d *data)
 {
 	int	idx;
 
-	// idx = end;
+	idx = end;
 	// while (idx < HEIGHT)
 	// {
 	// 	mlx_put_pixel(data->img, x, idx, colour_to_uint((t_col){0,0,100,255}));
@@ -223,9 +221,7 @@ void	draw_3d(t_cub3d *data)
 		else
 			wall_dist = (side_dist_y - delta_dist_y);
 		
-		// printf ("dist = %f", wall_dist);
 		int line_height = (int)(HEIGHT / wall_dist);
-		// printf ("line height = %i\n", line_height);
 		int draw_start = -line_height / 2 + HEIGHT / 2;
 		int draw_end = line_height / 2 + HEIGHT / 2;
 
@@ -249,15 +245,6 @@ void	draw_3d(t_cub3d *data)
 			wall_x = player->x + wall_dist * ray_dir_x;
 		wall_x -= floor((wall_x));
 
-		// int tex_x = (int)(wall_x * texWidth);
-		// if (side == 0 && ray_dir_x > 0)
-		// 	tex_x = texWidth - tex_x - 1;
-		// if (side == 1 && ray_dir_y < 0)
-		// 	tex_x = texWidth - tex_x - 1;
-
-		// double step = 1.0 * texHeight / line_height;
-		// double tex_pos = (draw_start - data->pitch - HEIGHT / 2 + line_height / 2) * step;
-
 		int tex_x = (int)(wall_x * data->tex->width);
 		if (side == 0 && ray_dir_x > 0)
 			tex_x = data->tex->width - tex_x - 1;
@@ -267,25 +254,11 @@ void	draw_3d(t_cub3d *data)
 		double step = 1.0 * data->tex->height / line_height;
 		double tex_pos = (draw_start - data->pitch - HEIGHT / 2 + line_height / 2) * step;
 
-		// if (side == 0)
-		// 	bresenham(x, draw_start, x, draw_end, data, 0x990000FF);
-		// else
-		// 	bresenham(x, draw_start, x, draw_end, data, 0xFF0000FF);
 		t_col	colour;
 		int buffer_idx = -1;
-		// for drawing generated textures
-		// for (int y = draw_start; y < draw_end; y++)
-		// {
-		// 	int tex_y = (int)tex_pos & (texHeight - 1);
-		// 	tex_pos += step;
-		// 	col = data->textures[5].tex[texHeight * tex_y + tex_x];
-		// 	buffer[++buffer_idx] = col;	
-		// }
 
-		//for drawing png textures
-			// pixelx = &texture->pixels[(i * texture->width) * texture->bytes_per_pixel];
 		if (side == 1)
-		{
+		{	
 			for (int y = draw_start; y < draw_end; y++)
 			{
 				int tex_y = (int)tex_pos & (int)(data->tex->pixels - 1);
@@ -402,9 +375,6 @@ void	cursorhook(double xpos, double ypos, void *param)
 	{
 		double turn = (WIDTH / 2) - xpos;
 		turn /= 50;
-		if (turn > 10)
-			printf ("BIG SIDE TURN %f\n", turn);
-		// printf ("xpos: %f,  mouseX: %f turn: %f\n", xpos, data->mouse_x, turn);
 
 		double oldDirX = data->player->dir_x;
 		data->player->dir_x = data->player->dir_x * cos(turn) - data->player->dir_y * sin(turn);
@@ -422,21 +392,15 @@ void	cursorhook(double xpos, double ypos, void *param)
 	{
 		
 		double turn = (HEIGHT / 2) - ypos;
-		// printf ("pitch?: %i, turn?: %f\n", data->pitch, turn);
 		// turn /= 5;
 
 		data->pitch += turn;
-		// if (turn > 50)
-		// 	printf ("%i BIG VERT TURN %f\n", data->pitch, turn);
 		if (data->pitch >  (HEIGHT / 3))
 			data->pitch =  (HEIGHT / 3);
 		if (data->pitch < (-HEIGHT / 3))
 			data->pitch = (-HEIGHT / 3);
 	}
 	mlx_set_mouse_pos(data->mlx, WIDTH / 2, HEIGHT / 2);
-	// data->mouse_x = xpos;
-	// bad_draw(data);
-	// draw_3d(data);
 }
 
 void	loophook(void *param)
@@ -506,7 +470,7 @@ bool	fill_map(char *file, t_cub3d *data)
 	char	*line;
 
 	// allocate map now todo: change + 10
-	data->level->map = ft_calloc(data->end_of_map - data->start_of_map + 10, sizeof(char *));
+	data->level->map = ft_calloc(data->end_of_map - data->start_of_map + 2, sizeof(char *));
 	if (!data->level->map)
 		error_exit("Failed to allocate level->map\n", 88);
 	printf ("allocated this big: [%i]\n", data->end_of_map - data->start_of_map + 2);
