@@ -6,15 +6,60 @@
 /*   By: auzochuk <auzochuk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/30 15:25:30 by auzochuk      #+#    #+#                 */
-/*   Updated: 2023/02/02 18:53:51 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/06 23:20:03 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/cub3d.h"
 
-int		open_map(char *file)
+bool	set_texture(char *str, t_cub3d *data)
 {
-	int fd;
+	return (true);
+}
+
+bool	fill_element(char *str, t_cub3d *data)
+{
+	bool	test;
+
+	test = false;
+	if (str && ft_strlen(str) == 0)
+		return (true);
+	if (ft_strncmp(str, "SO ", 3) == 0)
+	{
+		test = set_texture(str + 3, data);
+		printf ("south [%s]\n", str + 3);
+	}
+	if (ft_strncmp(str, "NO ", 3) == 0)
+	{
+		test = set_texture(str + 3, data);
+		printf ("north [%s]\n", str + 3);
+	}
+	if (ft_strncmp(str, "WE ", 3) == 0)
+	{
+		test = set_texture(str + 3, data);
+		printf ("west [%s]\n", str + 3);
+	}
+	if (ft_strncmp(str, "EA ", 3) == 0)
+	{
+		test = set_texture(str + 3, data);
+		printf ("east [%s]\n", str + 3);
+	}
+	if (ft_strncmp(str, "C ", 2) == 0)
+	{
+		test = set_texture(str + 2, data);
+		printf ("ceiling [%s]\n", str + 2);
+	}
+	if (ft_strncmp(str, "F ", 2) == 0)
+	{
+		test = set_texture(str + 2, data);
+		printf ("floor [%s]\n", str + 2);
+	}
+	return (test);
+}
+
+int		open_map(char *file, t_cub3d *data)
+{
+	int		fd;
 
 	if (ft_strlen(file) < 4)
 		error_exit(RED "filename too short noob\n", 6);
@@ -35,7 +80,7 @@ void	alloc_map(char *file, t_cub3d *data)
 	data->level= calloc(1, sizeof(t_map));
 	if(!data->level)
 		error_exit("allocation failed\n", 69);
-	fd = open_map(file);
+	fd = open_map(file, data);
 	while (get_next_line(fd, &line) > 0)
 	{
 		data->level->height++;
@@ -45,7 +90,7 @@ void	alloc_map(char *file, t_cub3d *data)
 		free(line);
 	close(fd);
 	data->level->map = ft_calloc(data->level->height + 1, sizeof(char *));
-	fd = open_map(file);
+	fd = open_map(file, data);
 	while (get_next_line(fd, &line))
 	{
 		if (ft_strlen(line) > data->level->width)
@@ -57,7 +102,7 @@ void	alloc_map(char *file, t_cub3d *data)
 	alloc = -1;
 	while(++alloc < data->level->height)
 	{
-		data->level->map[alloc] = calloc(data->level->width + 1, sizeof(char));
+		data->level->map[alloc] = ft_calloc(data->level->width + 1, sizeof(char));
 		if(!data->level->map[alloc])
 			error_exit("allocation failed\n", 69);
 	}
@@ -75,7 +120,10 @@ bool	check_direction(t_parse parse, t_map *level)
 			return (true);
 		}
 		else if (!ft_charinstr(level->map[parse.y][parse.x], VALID_TILES))
+		{
+			printf ("no wall found!\n");
 			return (false);
+		}
 		// printf ("path [%i][%i] ?: [%c]\n", parse.x + 1, parse.y + 1, level->map[parse.y][parse.x]);
 
 		parse.x += parse.dx;
@@ -164,20 +212,20 @@ bool	parse_map(char *file, t_cub3d *data)
 	int		i;
 
 	i = 0;
-	alloc_map(file, data);
-	fd = open_map(file);
-	//this copies unto the map
-	while (get_next_line(fd, &line) > 0)
-	{
-		ft_strlcpy(data->level->map[i], line, data->level->width + 1);
-		free(line);
-		i++;
-	}
-	if (line)
-		free(line);
+	// alloc_map(file, data);
+	// fd = open_map(file, data);
+	// while (get_next_line(fd, &line) > 0)
+	// {
+	// 	ft_strlcpy(data->level->map[i], line, data->level->width + 1);
+	// 	free(line);
+	// 	i++;
+	// }
+	// if (line)
+	// 	free(line);
 	int e = -1;
 	int z = -1;
-	//this just prints
+	// this just prints
+	printf ("map: width: %i height: %i\n", data->level->width, data->level->height);
 	while (data->level->map[++e])
 	{
 		z = -1;
@@ -185,6 +233,8 @@ bool	parse_map(char *file, t_cub3d *data)
 			printf ("%c", data->level->map[e][z]);
 		printf ("\n");
 	}
+	printf ("\n");
+
 	if (!init_bob(data))
 		return (false);
 	int x = 0;

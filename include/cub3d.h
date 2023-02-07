@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/16 15:54:39 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/02 18:34:39 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/07 00:21:09 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,23 +76,34 @@ typedef struct s_map
 typedef struct s_texture
 {
 	int	tex[WIDTH * HEIGHT];
+
 }	t_texture;
 
 typedef struct s_cub3d
 {
-	mlx_t		*mlx;
-	mlx_image_t	*img;
+	mlx_t			*mlx;
+	mlx_image_t		*img;
 	
-	t_map		*level;
-	t_player	*player;
-	bool		has_player;
-	bool		crouching;
-	t_texture	*textures;
-	mlx_texture_t *tex;
-	mlx_texture_t *north;
+	t_map			*level;
+	t_player		*player;
+	bool			has_player;
+	bool			crouching;
+	t_texture		*textures;
+	mlx_texture_t	*tex;
+
+	mlx_texture_t	*north;
+	mlx_texture_t	*south;
+	mlx_texture_t	*east;
+	mlx_texture_t	*west;
+	t_col			ceiling;
+	t_col			floor;
+
 
 	// char **map;
 	// int scale;
+	int			start_of_map;
+	int			end_of_map;
+
 
 	int			pitch;
 	double		mouse_x;
@@ -104,6 +115,9 @@ typedef struct s_cub3d
 void	error_exit(char *msg, int error_code);
 bool	parse_map(char *file, t_cub3d *data);
 
+int		open_map(char *file, t_cub3d *data);
+
+bool	fill_element(char *str, t_cub3d *data);
 
 
 

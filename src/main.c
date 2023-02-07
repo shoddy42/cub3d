@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/08 19:11:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/02 18:42:30 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/07 01:11:00 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ void	bad_draw(t_cub3d *data)
 	int x = -1;
 	int y = -1;
 
+	//todo: change to floor and ceiling colours
 	ft_bzero(data->img->pixels, WIDTH * HEIGHT * sizeof(unsigned int));
 	while (++y < data->level->height)
 	{
@@ -99,11 +100,48 @@ void	bad_draw(t_cub3d *data)
 	draw_player(data->player, data);
 }
 
-void	draw_buffer(uint32_t *buffer, int start, int end, int i, int x, t_cub3d *data)
+uint32_t	colour_to_uint(t_col col)
 {
+	uint32_t ret;
+
+	// printf ("col R: %i G: %i B: %i A: %i\n", col.r, col.g, col.b, col.a);
+	if (col.r < 0)
+		col.r = 0;
+	if (col.g < 0)
+		col.g = 0;
+	if (col.b < 0)
+		col.b = 0;
+	if (col.a < 0)
+		col.a = 0;
+		
+	ret = col.a;
+	ret += col.r << 24;
+	ret += col.g << 16;
+	ret += col.b << 8;
+	return (ret);
+}
+
+void	draw_buffer(t_col *buffer, int start, int end, int i, int x, t_cub3d *data)
+{
+	int	idx;
+
+	// idx = end;
+	// while (idx < HEIGHT)
+	// {
+	// 	mlx_put_pixel(data->img, x, idx, colour_to_uint((t_col){0,0,100,255}));
+	// 	idx++;
+	// }
+	// //draws ceiling
+	// idx = 0;
+	// while (idx < start)
+	// {
+	// 	mlx_put_pixel(data->img, x, idx, colour_to_uint((t_col){255,0,0,255}));
+	// 	idx++;
+	// }
+
 	while (i > 0)
 	{
-		mlx_put_pixel(data->img, x, i + start, buffer[i]);
+		mlx_put_pixel(data->img, x, i + start, colour_to_uint(buffer[i]));
 		i--;
 	}
 }
@@ -111,7 +149,7 @@ void	draw_buffer(uint32_t *buffer, int start, int end, int i, int x, t_cub3d *da
 void	draw_3d(t_cub3d *data)
 {
 	t_player	*player = data->player;
-	uint32_t	buffer[HEIGHT];
+	t_col		buffer[HEIGHT];
 
 	int x = 0;
 	while (x < WIDTH)
@@ -193,11 +231,11 @@ void	draw_3d(t_cub3d *data)
 
 		draw_end += data->pitch;
 		draw_start += data->pitch;
-		// if (data->crouching == true)
-		// {
-		// 	draw_end += 1;
-		// 	draw_start += 1;
-		// }
+		if (data->crouching == true)
+		{
+			draw_end += 1;
+			draw_start += 1;
+		}
 		if (draw_start < 0)
 			draw_start = 0;
 		if (draw_end >= HEIGHT)
@@ -233,13 +271,7 @@ void	draw_3d(t_cub3d *data)
 		// 	bresenham(x, draw_start, x, draw_end, data, 0x990000FF);
 		// else
 		// 	bresenham(x, draw_start, x, draw_end, data, 0xFF0000FF);
-		uint32_t col;
-		if (side == 0)
-			col = 0x990000FF;
-		else
-			col = 0xFF0000FF;
-
-		// col = data->textures->tex[1][texHeight * ]
+		t_col	colour;
 		int buffer_idx = -1;
 		// for drawing generated textures
 		// for (int y = draw_start; y < draw_end; y++)
@@ -258,19 +290,19 @@ void	draw_3d(t_cub3d *data)
 			{
 				int tex_y = (int)tex_pos & (int)(data->tex->pixels - 1);
 				tex_pos += step;
-				col =  (uint32_t)data->tex->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel] << 24;
-				col += (uint32_t)data->tex->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 1] << 16;
-				col += (uint32_t)data->tex->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 2] << 8;
-				col += (uint32_t)data->tex->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 3];
-				// if (side == 0)
-				// {
-				// 	// col -= 0x05050500;
-				// }
-				if (wall_dist > 4)
+				
+				colour.r = (int)data->tex->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel];
+				colour.g = (int)data->tex->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 1];
+				colour.b = (int)data->tex->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 2];
+				colour.a = (int)data->tex->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 3];
+				if (wall_dist > 1)
 				{
-					col /= 2;
+					colour.r -= wall_dist * 5;
+					colour.g -= wall_dist * 5;
+					colour.b -= wall_dist * 5;
+					colour.a -= wall_dist * 5;
 				}
-				buffer[++buffer_idx] = col;
+				buffer[++buffer_idx] = colour;
 			}
 
 		}
@@ -280,23 +312,22 @@ void	draw_3d(t_cub3d *data)
 			{
 				int tex_y = (int)tex_pos & (int)(data->north->pixels - 1);
 				tex_pos += step;
-				col =  (uint32_t)data->north->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel] << 24;
-				col += (uint32_t)data->north->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 1] << 16;
-				col += (uint32_t)data->north->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 2] << 8;
-				col += (uint32_t)data->north->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 3];
-				// if (side == 0)
-				// {
-				// 	// col -= 0x05050500;
-				// }
-				if (wall_dist > 4)
+				
+				colour.r = (int)data->north->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel];
+				colour.g = (int)data->north->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 1];
+				colour.b = (int)data->north->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 2];
+				colour.a = (int)data->north->pixels[(data->tex->height * tex_y + tex_x) * data->tex->bytes_per_pixel + 3];
+				if (wall_dist > 1)
 				{
-					col /= 2;
+					colour.r -= wall_dist * 5;
+					colour.g -= wall_dist * 5;
+					colour.b -= wall_dist * 5;
+					colour.a -= wall_dist * 5;
 				}
-				buffer[++buffer_idx] = col;
+				buffer[++buffer_idx] = colour;
 			}
 		}
 		draw_buffer(buffer, draw_start, draw_end, buffer_idx, x, data);
-		// bresenham(x, draw_start, x, draw_end, data, col);
 		x++;
 	}
 	mlx_draw_texture(data->img, data->north, 0, 0);
@@ -456,10 +487,10 @@ bool	init(char **av, t_cub3d *data)
 	mlx_set_cursor_mode(data->mlx, MLX_MOUSE_HIDDEN);
 	init_textures(data);
 
-	// mlx_set_mouse_pos(data->mlx, WIDTH / 2, HEIGHT / 2);
+	mlx_set_mouse_pos(data->mlx, WIDTH / 2, HEIGHT / 2);
 	data->img = mlx_new_image(data->mlx, WIDTH, HEIGHT);
 	data->textures = ft_calloc(9, sizeof(t_texture));
-	generate_textures(data);
+	// generate_textures(data);
 	mlx_image_to_window(data->mlx, data->img, 0, 0);
 	mlx_key_hook(data->mlx, &keyhook, data);
 	mlx_mouse_hook(data->mlx, &mousehook, data);
@@ -468,6 +499,89 @@ bool	init(char **av, t_cub3d *data)
 	return (true);
 }
 
+bool	fill_map(char *file, t_cub3d *data)
+{
+	int		i;
+	int		fd;
+	char	*line;
+
+	// allocate map now todo: change + 10
+	data->level->map = ft_calloc(data->end_of_map - data->start_of_map + 10, sizeof(char *));
+	if (!data->level->map)
+		error_exit("Failed to allocate level->map\n", 88);
+	printf ("allocated this big: [%i]\n", data->end_of_map - data->start_of_map + 2);
+	i = -1;
+	while (++i <= data->end_of_map - data->start_of_map)
+	{
+		//2?
+		data->level->map[i] = ft_calloc(data->level->width + 2, sizeof(char));
+		if (!data->level->map[i])
+			error_exit("map[x] allocation failed\n", 69);
+	}
+	fd = open_map(file, data);
+	i = 0;
+	//skip not map
+	while (i < data->start_of_map && get_next_line(fd, &line))
+	{
+		i++;
+		if (line)
+			free(line);
+	}
+	while (i <= data->end_of_map && get_next_line(fd, &line))
+	{
+		//2?
+		ft_strlcpy(data->level->map[i - data->start_of_map], line, data->level->width + 2);
+		printf ("?: %s\n", data->level->map[i - data->start_of_map]);
+		free(line);
+		i++;
+	}
+	data->level->height = data->end_of_map - data->start_of_map + 1;
+	return (true);
+}
+
+//todo: change **av to *file
+bool	init_map(char **av, t_cub3d *data)
+{
+	int		fd;
+	char	*line;
+
+	fd = open_map(av[1], data);
+	data->level = calloc(1, sizeof(t_map));
+	if(!data->level)
+		error_exit("allocation failed\n", 69);
+	// fill all the textures
+	while (get_next_line(fd, &line) && fill_element(line, data))
+	{
+		data->start_of_map++;
+		if (line)
+			free(line);
+	}
+	if (!line)
+		error_exit("no map!\n", 25);
+	// here is the first line of our map
+	printf ("line? [%s]\n", line);
+	if (ft_strlen(line) > data->level->width)
+		data->level->width = ft_strlen(line);
+	if (line)
+		free(line);
+	// get rest of map
+	while (get_next_line(fd, &line) && ft_strlen(line) > 0)
+	{
+		data->end_of_map++;
+		if (ft_strlen(line) > data->level->width)
+			data->level->width = ft_strlen(line);
+		printf ("line? [%s]\n", line);
+		if (line)
+			free(line);
+	}
+	data->end_of_map += data->start_of_map;
+	printf ("start of map = %i, [%s]\nend of map   = %i\n", data->start_of_map, line, data->end_of_map);
+	printf ("map width? %i\n", data->level->width);
+	if (line)
+		free(line);
+	fill_map(av[1], data);
+	return (true);	
+}
 
 int	main(int ac, char **av)
 {
@@ -478,13 +592,15 @@ int	main(int ac, char **av)
 		printf ("bad xD\n");
 		exit(0);
 	}
+	ft_bzero(&data, sizeof(t_cub3d));
+	init_map(av, &data);
+	init(av, &data);
 	if (!parse_map(av[1], &data))
 	{
 		printf ("Parsley not good\n");
 		printf ("player x: %f player y: %f\n", data.player->x, data.player->y);
 		return (0);
 	}
-	init(av, &data);
 
 	bad_draw(&data);
 	draw_3d(&data);
