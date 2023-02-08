@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/16 15:54:39 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/07 00:21:09 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/08 01:37:57 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,30 +18,38 @@
 # define SCALE 16
 # define texWidth 64
 # define texHeight 64
-# define CEILING 0x999999FF
-# define VALID_TILES "01NSWE"
+# define VALID_TILES "01NSWE "
 # define WALL_TILES "1"
 # define PLAYER_TILES "NSWE"
 
 # include <stdbool.h>
 # include <stdlib.h>
 # include <stdio.h> //todo: remove
-# define PI2 M_PI/2
-# define PI3 3*M_PI/2
 # include <fcntl.h>
 # include <math.h>
 # include "../libft/include/libft.h"
 # include "../mlx/include/MLX42/MLX42.h"
 
-typedef	struct s_parse
+typedef enum e_tex_type
 {
-	int x;
-	int y;
+	NORTH,
+	SOUTH,
+	EAST,
+	WEST,
+	CEILING,
+	FLOOR,
+}	t_tex_type;
+
+
+typedef struct s_parse
+{
+	int	x;
+	int	y;
 	int	dx;
 	int	dy;
 }	t_parse;
 
-typedef	struct s_player
+typedef struct s_player
 {
 	double	x;
 	double	y;
@@ -53,15 +61,46 @@ typedef	struct s_player
 	double	plane_y;
 }	t_player;
 
-typedef struct t_col
+typedef struct s_col
 {
-	int r;
-	int g;
-	int b;
-	int a;
+	int	r;
+	int	g;
+	int	b;
+	int	a;
 
-	
 }	t_col;
+
+typedef struct s_draw
+{
+	int		buffer_idx;
+
+	double	camera_x;
+	double	ray_dir_x;
+	double	ray_dir_y;
+
+	int		map_x;
+	int		map_y;
+	double	side_dist_x;
+	double	side_dist_y;
+	double	delta_dist_x;
+	double	delta_dist_y;
+	double	wall_dist;
+
+	int		step_x;
+	int		step_y;
+
+	int		line_height;
+	int		line_start;
+	int		line_end;
+
+	double	wall_x;
+	int		tex_x;
+	int		tex_y;
+	double	tex_pos;
+	double	step;
+
+	int		side;
+}	t_draw;
 
 typedef struct s_map
 {
@@ -91,10 +130,10 @@ typedef struct s_cub3d
 	t_texture		*textures;
 	mlx_texture_t	*tex;
 
-	mlx_texture_t	*north;
-	mlx_texture_t	*south;
-	mlx_texture_t	*east;
-	mlx_texture_t	*west;
+	// mlx_texture_t	*north;
+	// mlx_texture_t	*south;
+	// mlx_texture_t	*east;
+	// mlx_texture_t	*west;
 	t_col			ceiling;
 	t_col			floor;
 
@@ -120,6 +159,23 @@ int		open_map(char *file, t_cub3d *data);
 bool	fill_element(char *str, t_cub3d *data);
 
 
+//hooks
+void	keyhook(mlx_key_data_t keydata, void *param);
+void	mousehook(mouse_key_t button, action_t action, modifier_key_t mods, void *param);
+void	cursorhook(double xpos, double ypos, void *param);
+void	loophook(void *param);
+
+//draw
+void	draw_3d(t_cub3d *data);
+void	draw_cursor(t_cub3d *data);
+void	draw_player(t_player *player, t_cub3d *data);
+void	draw_square(int	x, int y, t_cub3d *data, uint32_t color);
+void	bad_draw(t_cub3d *data);
+void	draw_buffer(t_col *buffer, int start, int end, int i, int x, t_cub3d *data);
+
+// ray_setup
+void	setup_ray(t_draw *draw, int x, t_cub3d *data);
+void	get_step(t_draw *draw, t_cub3d *data);
 
 
 //string colors

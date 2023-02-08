@@ -6,14 +6,66 @@
 /*   By: auzochuk <auzochuk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/30 15:25:30 by auzochuk      #+#    #+#                 */
-/*   Updated: 2023/02/06 23:20:03 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/08 00:47:32 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/cub3d.h"
 
-bool	set_texture(char *str, t_cub3d *data)
+bool	set_texture(char *str, t_cub3d *data, t_tex_type type)
 {
+	mlx_texture_t	*tex;
+
+	while (*str && *str == ' ')
+		str++;
+	tex = mlx_load_png(str);
+	if (!tex)
+	{
+		printf (RED "Error. " RESET "Failed to load texture [%s]\n", str);
+		exit (1);
+	}
+	data->tex[type] = *tex;
+	return (true);
+}
+
+bool	has_num(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == ',' || str[i] == '\0')
+			return (false);
+		else if (ft_isdigit(str[i]))
+			return (true);
+		i++;
+	}
+	return (false);
+}
+
+bool	set_colour(char *str, t_col *col)
+{
+	if (ft_strcomply(str, " ,0123456789") == false)
+		error_exit("illegal characters!\n", 99);
+	if (has_num(str) == false)
+		error_exit("No red value!\n", -2);
+	col->r = ft_atoi(str);
+	if (col->r > 255 || col->r < 0)
+		error_exit("Red colour must be in range [0 - 255]!\n", 8);
+	str = ft_strchr(str, ',');
+	if (!str || str[1] == '\0' || has_num(str + 1) == false)
+		error_exit("No green value!\n", 12);
+	col->g = ft_atoi(str + 1);
+	if (col->g > 255 || col->g < 0)
+		error_exit("Green colour must be in range [0 - 255]!\n", 9);
+	str = ft_strchr(str + 1, ',');
+	if (!str || str[1] == '\0' || has_num(str + 1) == false)
+		error_exit("No blue value!\n", 10);
+	col->b = ft_atoi(str + 1);
+	if (col->b > 255 || col->b < 0)
+		error_exit ("Blue colour must be in range [0 - 255]!\n", 11);
+	col->a = 255;
 	return (true);
 }
 
@@ -25,39 +77,21 @@ bool	fill_element(char *str, t_cub3d *data)
 	if (str && ft_strlen(str) == 0)
 		return (true);
 	if (ft_strncmp(str, "SO ", 3) == 0)
-	{
-		test = set_texture(str + 3, data);
-		printf ("south [%s]\n", str + 3);
-	}
+		test = set_texture(str + 3, data, SOUTH);
 	if (ft_strncmp(str, "NO ", 3) == 0)
-	{
-		test = set_texture(str + 3, data);
-		printf ("north [%s]\n", str + 3);
-	}
+		test = set_texture(str + 3, data, NORTH);
 	if (ft_strncmp(str, "WE ", 3) == 0)
-	{
-		test = set_texture(str + 3, data);
-		printf ("west [%s]\n", str + 3);
-	}
+		test = set_texture(str + 3, data, WEST);
 	if (ft_strncmp(str, "EA ", 3) == 0)
-	{
-		test = set_texture(str + 3, data);
-		printf ("east [%s]\n", str + 3);
-	}
+		test = set_texture(str + 3, data, EAST);
 	if (ft_strncmp(str, "C ", 2) == 0)
-	{
-		test = set_texture(str + 2, data);
-		printf ("ceiling [%s]\n", str + 2);
-	}
+		test = set_colour(str + 2, &data->ceiling);
 	if (ft_strncmp(str, "F ", 2) == 0)
-	{
-		test = set_texture(str + 2, data);
-		printf ("floor [%s]\n", str + 2);
-	}
+		test = set_colour(str + 2, &data->floor);
 	return (test);
 }
 
-int		open_map(char *file, t_cub3d *data)
+int	open_map(char *file, t_cub3d *data)
 {
 	int		fd;
 
@@ -71,65 +105,20 @@ int		open_map(char *file, t_cub3d *data)
 	return (fd);
 }
 
-void	alloc_map(char *file, t_cub3d *data)
-{
-	int		fd;
-	char	*line;
-	int		alloc;
-
-	data->level= calloc(1, sizeof(t_map));
-	if(!data->level)
-		error_exit("allocation failed\n", 69);
-	fd = open_map(file, data);
-	while (get_next_line(fd, &line) > 0)
-	{
-		data->level->height++;
-		free(line);
-	}
-	if (line)
-		free(line);
-	close(fd);
-	data->level->map = ft_calloc(data->level->height + 1, sizeof(char *));
-	fd = open_map(file, data);
-	while (get_next_line(fd, &line))
-	{
-		if (ft_strlen(line) > data->level->width)
-			data->level->width = ft_strlen(line);
-		free(line);
-	}
-	if (line)
-		free(line);
-	alloc = -1;
-	while(++alloc < data->level->height)
-	{
-		data->level->map[alloc] = ft_calloc(data->level->width + 1, sizeof(char));
-		if(!data->level->map[alloc])
-			error_exit("allocation failed\n", 69);
-	}
-	close(fd);
-}
-
 bool	check_direction(t_parse parse, t_map *level)
 {
 	while (parse.x < level->width && parse.y < level->height && parse.x >= 0 && parse.y >= 0)
 	{
-		// if ()
 		if (level->map[parse.y][parse.x] == '1')
-		{
-			// printf ("[%i][%i] found wall [%i][%i]  ?: [%c]\n", parse.dx, parse.dy, parse.x + 1, parse.y + 1, level->map[parse.y][parse.x]);
 			return (true);
-		}
 		else if (!ft_charinstr(level->map[parse.y][parse.x], VALID_TILES))
 		{
 			printf ("no wall found!\n");
 			return (false);
 		}
-		// printf ("path [%i][%i] ?: [%c]\n", parse.x + 1, parse.y + 1, level->map[parse.y][parse.x]);
-
 		parse.x += parse.dx;
 		parse.y += parse.dy;
 	}
-	// printf ("false2\n");
 	// printf ("[%i][%i] ended at [%i][%i]  ?: [%c]\n", parse.dx, parse.dy, parse.x + 1, parse.y + 1, level->map[parse.y][parse.x]);
 	return (false);
 }
@@ -138,9 +127,9 @@ bool	check_cell(int x, int y, t_map *level)
 {
 	if (!check_direction((t_parse){x, y, 1, 0}, level)) //right
 		return (false);
-	if (!check_direction((t_parse){x, y, -1, 0}, level))	//left
+	if (!check_direction((t_parse){x, y, -1, 0}, level))//left
 		return (false);
-	if (!check_direction((t_parse){x, y, 0, -1}, level))	//up
+	if (!check_direction((t_parse){x, y, 0, -1}, level))//up
 		return (false);
 	if (!check_direction((t_parse){x, y, 0, 1}, level))	//down
 		return (false);
@@ -158,10 +147,10 @@ bool	check_cell(int x, int y, t_map *level)
 // E
 bool	init_bob(t_cub3d *data)
 {
-	bool has_player;
-	t_map *level;
-	int	x;
-	int	y;
+	bool	has_player;
+	t_map	*level;
+	int		x;
+	int		y;
 
 	data->player = ft_calloc(1, sizeof(t_player));
 	if (!data->player)
@@ -173,7 +162,6 @@ bool	init_bob(t_cub3d *data)
 	while (y < level->height)
 	{
 		x = 0;
-		// printf ("hello %i [%s]\n", level->width, level->map[y]);
 		while (x < level->width)
 		{
 			if (ft_charinstr(level->map[y][x], PLAYER_TILES) == true && has_player == false)
@@ -209,37 +197,13 @@ bool	parse_map(char *file, t_cub3d *data)
 {
 	char	*line;
 	int		fd;
-	int		i;
-
-	i = 0;
-	// alloc_map(file, data);
-	// fd = open_map(file, data);
-	// while (get_next_line(fd, &line) > 0)
-	// {
-	// 	ft_strlcpy(data->level->map[i], line, data->level->width + 1);
-	// 	free(line);
-	// 	i++;
-	// }
-	// if (line)
-	// 	free(line);
-	int e = -1;
-	int z = -1;
-	// this just prints
-	printf ("map: width: %i height: %i\n", data->level->width, data->level->height);
-	while (data->level->map[++e])
-	{
-		z = -1;
-		while (data->level->map[e][++z])
-			printf ("%c", data->level->map[e][z]);
-		printf ("\n");
-	}
-	printf ("\n");
+	int		x;
+	int		y;
 
 	if (!init_bob(data))
 		return (false);
-	int x = 0;
-	int y = -1;
 	// actual parsing of the map
+	y = -1;
 	while (data->level->map[++y])
 	{
 		x = -1;

@@ -6,7 +6,7 @@
 #    By: wkonings <wkonings@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2023/01/16 15:30:52 by wkonings      #+#    #+#                  #
-#    Updated: 2023/02/07 00:20:24 by wkonings      ########   odam.nl          #
+#    Updated: 2023/02/08 01:22:56 by wkonings      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,7 +52,7 @@ INC			:= -I include
 HEADER_FILES:=	cub3d.h
 HEADERS		:=	$(addprefix $(INCLUDE_DIR)/, $(HEADER_FILES))
 
-MAIN_FILES	:= main parsing
+MAIN_FILES	:= main parsing hooks raycasting ray_setup
 
 PARSER_FILES:= ##parser parse_objects parse_utils
 
