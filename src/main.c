@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/08 19:11:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/08 01:49:36 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/08 01:50:38 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ void	draw_buffer(t_col *buffer, int start, int end, int i, int x, t_cub3d *data)
 
 	idx = end;
 	//floor
-	while (idx <= HEIGHT)
+	while (idx < HEIGHT)
 	{
 		mlx_put_pixel(data->img, x, idx, colour_to_uint(data->floor));
 		idx++;
