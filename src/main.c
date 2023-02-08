@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/08 19:11:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/08 01:48:10 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/08 01:49:36 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	draw_square(int	x, int y, t_cub3d *data, uint32_t color)
 
 void	draw_player(t_player *player, t_cub3d *data)
 {
-	int	i;
+	int i;
 
 	i = 0;
 
@@ -145,6 +145,8 @@ void	draw_buffer(t_col *buffer, int start, int end, int i, int x, t_cub3d *data)
 		i--;
 	}
 }
+
+
 
 bool	init(char **av, t_cub3d *data)
 {
