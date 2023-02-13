@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/02/13 06:19:28 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/13 12:13:10 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/13 12:55:47 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,24 +50,30 @@ void	draw_square(int x, int y, t_cub3d *data, uint32_t color)
 	}
 }
 
-void	draw_player(t_player *player, t_cub3d *data)
+void	draw_player(t_player *player, t_cub3d *data, int width, int height)
 {
-	int	i;
+	int	offset;
+	int	scale;
 
-	i = -data->scale / 4;
-	while (i < data->scale / 4)
+	scale = data->scale;
+	offset = -data->scale / 4;
+	while (offset < scale / 4)
 	{
-		i++;
-		bresenham((t_point2d){WIDTH - (data->level->width * data->scale) + (player->pos[X] * data->scale) - data->scale / 4,
-			HEIGHT - (data->level->height * data->scale) + player->pos[Y] * data->scale + i},
-			(t_point2d){WIDTH - (data->level->width * data->scale) + (player->pos[X] * data->scale) + (data->scale / 4),
-			HEIGHT - (data->level->height * data->scale) + player->pos[Y] * data->scale + i},
+		offset++;
+		bresenham((t_point2d){WIDTH - (width * scale)
+			+ (player->pos[X] * scale) - scale / 4,
+			HEIGHT - (height * scale) + (player->pos[Y] * scale) - offset},
+			(t_point2d){WIDTH - (width * scale)
+			+ (player->pos[X] * scale) + (scale / 4),
+			HEIGHT - (height * scale) + (player->pos[Y] * scale) - offset},
 			data, 0xFF0000FF);
 	}
-	bresenham((t_point2d){WIDTH - (data->level->width * data->scale) + (player->pos[X] * data->scale),
-		HEIGHT - (data->level->height * data->scale) + player->pos[Y] * data->scale},
-		(t_point2d){WIDTH - (data->level->width * data->scale) + (player->pos[X] * data->scale) + player->dir[X] * (data->scale * 2),
-		HEIGHT - (data->level->height * data->scale) + player->pos[Y] * data->scale + player->dir[Y] * (data->scale * 2)},
+	bresenham((t_point2d){WIDTH - (width * scale) + (player->pos[X] * scale),
+		HEIGHT - (height * scale) + player->pos[Y] * scale},
+		(t_point2d){WIDTH - (width * scale) + (player->pos[X] * scale)
+		+ player->dir[X] * (scale * 2),
+		HEIGHT - (height * scale) + player->pos[Y] * scale
+		+ player->dir[Y] * (scale * 2)},
 		data, 0x0000FFFF);
 }
 
@@ -93,7 +99,7 @@ void	draw_cursor(t_cub3d *data)
 }
 
 //minimap
-void	bad_draw(t_cub3d *data)
+void	draw_minimap(t_cub3d *data)
 {
 	int	x;
 	int	y;
@@ -112,7 +118,7 @@ void	bad_draw(t_cub3d *data)
 		}
 	}
 	draw_cursor(data);
-	draw_player(data->player, data);
+	draw_player(data->player, data, data->level->width, data->level->height);
 }
 
 void	draw_buffer(t_col *buffer, int x, t_draw *draw, t_cub3d *data)

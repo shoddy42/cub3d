@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/08 19:11:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/13 12:00:36 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/13 13:04:46 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ void	init(char **av, t_cub3d *data)
 		data->scale = HEIGHT / data->level->height / 2;
 	if (data->scale < 4)
 		data->scale = 4;
-	printf ("scale? %i\n", data->scale);
 	data->mlx = mlx_init(WIDTH, HEIGHT, av[1], false);
 	if (!data->mlx)
 		error_exit("Error: Failed to allocate mlx instance.\n", 1);
@@ -42,7 +41,6 @@ void	init(char **av, t_cub3d *data)
 	if (mlx_image_to_window(data->mlx, data->img, 0, 0) == -1)
 		error_exit("Error: Failed to push image to window\n", 1);
 	mlx_key_hook(data->mlx, &keyhook, data);
-	mlx_mouse_hook(data->mlx, &mousehook, data);
 	mlx_cursor_hook(data->mlx, &cursorhook, data);
 	if (mlx_loop_hook(data->mlx, &loophook, data) == false)
 		error_exit("Error: Failed to initialise loop hook\n", 1);

@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/16 15:54:39 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/13 10:55:15 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/13 12:55:37 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,20 +157,29 @@ uint32_t	colour_to_uint(t_col col);
 //map
 bool	init_map(char **av, t_cub3d *data);
 
-
+//wasd
+void	move_back(t_cub3d *data, t_player *player,
+			char **map, float movespeed);
+void	move_forward(t_cub3d *data, t_player *player,
+			char **map, float movespeed);
+void	move_left(t_cub3d *data, t_player *player,
+			char **map, float movespeed);
+void	move_right(t_cub3d *data, t_player *player,
+			char **map, float movespeed);
 
 //hooks
 void	keyhook(mlx_key_data_t keydata, void *param);
 void	mousehook(mouse_key_t button, action_t action, modifier_key_t mods, void *param);
 void	cursorhook(double xpos, double ypos, void *param);
+void	kbm_turn_side(t_cub3d *data, int dir);
 void	loophook(void *param);
 
 //draw
 void	draw_3d(t_cub3d *data);
 void	draw_cursor(t_cub3d *data);
-void	draw_player(t_player *player, t_cub3d *data);
-void	draw_square(int	x, int y, t_cub3d *data, uint32_t color);
-void	bad_draw(t_cub3d *data);
+void	draw_player(t_player *player, t_cub3d *data, int width, int height);
+void	draw_square(int x, int y, t_cub3d *data, uint32_t color);
+void	draw_minimap(t_cub3d *data);
 void	draw_buffer(t_col *buffer, int x, t_draw *draw, t_cub3d *data);
 
 // ray_setup

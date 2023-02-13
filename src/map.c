@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/02/13 06:10:36 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/13 11:56:56 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/13 12:28:39 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ bool	fill_map(char *file, t_cub3d *data)
 	char	*line;
 
 	data->level->map = ft_calloc(data->end_of_map - data->start_of_map + 2,
-		sizeof(char *));
+			sizeof(char *));
 	if (!data->level->map)
 		error_exit("Failed to allocate level->map\n", 88);
 	i = -1;
