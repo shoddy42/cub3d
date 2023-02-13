@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/02/08 01:21:36 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/08 01:36:37 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/13 07:59:14 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,18 @@ void	setup_ray(t_draw *draw, int x, t_cub3d *data)
 	ft_bzero(draw, sizeof(t_draw));
 	player = data->player;
 	draw->camera_x = 2 * x / (double)WIDTH - 1;
-	draw->ray_dir_x = player->dir_x + player->plane_x * draw->camera_x;
-	draw->ray_dir_y = player->dir_y + player->plane_y * draw->camera_x;
-	draw->map_x = (int)player->x;
-	draw->map_y = (int)player->y;
-	if (draw->ray_dir_x == 0)
-		draw->delta_dist_x = 1e30;
+	draw->ray_dir[X] = player->dir[X] + player->plane_x * draw->camera_x;
+	draw->ray_dir[Y] = player->dir[Y] + player->plane_y * draw->camera_x;
+	draw->map_x = (int)player->pos[X];
+	draw->map_y = (int)player->pos[Y];
+	if (draw->ray_dir[X] == 0)
+		draw->delta_dist[X] = 1e30;
 	else
-		draw->delta_dist_x = fabs(1 / draw->ray_dir_x);
-	if (draw->ray_dir_y == 0)
-		draw->delta_dist_y = 1e30;
+		draw->delta_dist[X] = fabs(1 / draw->ray_dir[X]);
+	if (draw->ray_dir[Y] == 0)
+		draw->delta_dist[Y] = 1e30;
 	else
-		draw->delta_dist_y = fabs(1 / draw->ray_dir_y);
+		draw->delta_dist[Y] = fabs(1 / draw->ray_dir[Y]);
 }
 
 void	get_step(t_draw *draw, t_cub3d *data)
@@ -38,26 +38,26 @@ void	get_step(t_draw *draw, t_cub3d *data)
 	t_player	*player;
 
 	player = data->player;
-	if (draw->ray_dir_x < 0)
+	if (draw->ray_dir[X] < 0)
 	{
 		draw->step_x = -1;
-		draw->side_dist_x = (player->x - draw->map_x) * draw->delta_dist_x;
+		draw->side_dist[X] = (player->pos[X] - draw->map_x) * draw->delta_dist[X];
 	}
 	else
 	{
 		draw->step_x = 1;
-		draw->side_dist_x = (draw->map_x + 1.0 - player->x)
-			* draw->delta_dist_x;
+		draw->side_dist[X] = (draw->map_x + 1.0 - player->pos[X])
+			* draw->delta_dist[X];
 	}
-	if (draw->ray_dir_y < 0)
+	if (draw->ray_dir[Y] < 0)
 	{
 		draw->step_y = -1;
-		draw->side_dist_y = (player->y - draw->map_y) * draw->delta_dist_y;
+		draw->side_dist[Y] = (player->pos[Y] - draw->map_y) * draw->delta_dist[Y];
 	}
 	else
 	{
 		draw->step_y = 1;
-		draw->side_dist_y = (draw->map_y + 1.0 - player->y)
-			* draw->delta_dist_y;
+		draw->side_dist[Y] = (draw->map_y + 1.0 - player->pos[Y])
+			* draw->delta_dist[Y];
 	}
 }

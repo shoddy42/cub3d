@@ -6,7 +6,7 @@
 #    By: wkonings <wkonings@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2023/01/16 15:30:52 by wkonings      #+#    #+#                  #
-#    Updated: 2023/02/08 01:22:56 by wkonings      ########   odam.nl          #
+#    Updated: 2023/02/13 10:35:42 by wkonings      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,7 +52,7 @@ INC			:= -I include
 HEADER_FILES:=	cub3d.h
 HEADERS		:=	$(addprefix $(INCLUDE_DIR)/, $(HEADER_FILES))
 
-MAIN_FILES	:= main parsing hooks raycasting ray_setup
+MAIN_FILES	:= main parsing parsing_utils hooks raycasting ray_setup map colour draw mousehook
 
 PARSER_FILES:= ##parser parse_objects parse_utils
 
@@ -99,6 +99,7 @@ $(NAME): $(LIBFT_A) $(LIBMLX_A) $(OBJS) $(HEADERS) $(MAKEFILE)
 	@printf "$(YELLOW)$(NAME) compiled!\n$(END)"
 # @make cubed
 
+
 all: $(BANNER) $(NAME)
 
 $(LIBS): $(LIBMLX_A) $(LIBFT_A)
@@ -119,6 +120,7 @@ $(OBJ_DIR)/%.o:$(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
 	@printf "$(YELLOW)Compiling $(PINK)$(notdir $@) $(RESET)from $(RED)$(notdir $<)$(END)\n"
 	@$(CC) $(FLAGS) -I include $(INCLUDE_READLINE) -c $< -o $@
+
 
 clean:
 	@printf "$(YELLOW)Cleaning up $(NAME)!\n$(END)"

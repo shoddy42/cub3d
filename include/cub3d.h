@@ -6,29 +6,35 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/16 15:54:39 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/08 01:37:57 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/13 10:55:15 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB3D_H
 # define CUB3D_H
 
-# define WIDTH 2048
-# define HEIGHT 1024
+# define WIDTH 2000
+# define HEIGHT 1000
 # define SCALE 16
-# define texWidth 64
-# define texHeight 64
 # define VALID_TILES "01NSWE "
 # define WALL_TILES "1"
 # define PLAYER_TILES "NSWE"
 
 # include <stdbool.h>
 # include <stdlib.h>
-# include <stdio.h> //todo: remove
+# include <stdio.h>
 # include <fcntl.h>
 # include <math.h>
 # include "../libft/include/libft.h"
 # include "../mlx/include/MLX42/MLX42.h"
+
+typedef double	t_point2d __attribute__ ((vector_size (2 * sizeof(double))));
+
+typedef enum e_direction2d
+{
+	X,
+	Y,
+}	t_dir2d;
 
 typedef enum e_tex_type
 {
@@ -40,7 +46,6 @@ typedef enum e_tex_type
 	FLOOR,
 }	t_tex_type;
 
-
 typedef struct s_parse
 {
 	int	x;
@@ -51,14 +56,12 @@ typedef struct s_parse
 
 typedef struct s_player
 {
-	double	x;
-	double	y;
-	double	dir_x;
-	double	dir_y;
-	double	side_dir_x;
-	double	side_dir_y;
-	double	plane_x;
-	double	plane_y;
+	t_point2d	pos;
+	t_point2d	dir;
+	t_point2d	side_dir;
+	t_point2d	plane;
+	double		plane_x;
+	double		plane_y;
 }	t_player;
 
 typedef struct s_col
@@ -67,47 +70,40 @@ typedef struct s_col
 	int	g;
 	int	b;
 	int	a;
-
 }	t_col;
 
 typedef struct s_draw
 {
-	int		buffer_idx;
+	int			buffer_idx;
 
-	double	camera_x;
-	double	ray_dir_x;
-	double	ray_dir_y;
+	double		camera_x;
+	t_point2d	ray_dir;
 
-	int		map_x;
-	int		map_y;
-	double	side_dist_x;
-	double	side_dist_y;
-	double	delta_dist_x;
-	double	delta_dist_y;
-	double	wall_dist;
+	int			map_x;
+	int			map_y;
+	t_point2d	side_dist;
+	t_point2d	delta_dist;
+	double		wall_dist;
 
-	int		step_x;
-	int		step_y;
+	int			step_x;
+	int			step_y;
 
-	int		line_height;
-	int		line_start;
-	int		line_end;
+	int			line_height;
+	int			line_start;
+	int			line_end;
 
-	double	wall_x;
-	int		tex_x;
-	int		tex_y;
-	double	tex_pos;
-	double	step;
+	double		wall_x;
+	int			tex_x;
+	int			tex_y;
+	double		tex_pos;
+	double		step;
 
-	int		side;
+	int			side;
 }	t_draw;
 
 typedef struct s_map
 {
 	char	**map;
-	//Floor color
-	//Ceiling color
-	//Wall color
 	int		width;
 	int		height;
 }	t_map;
@@ -122,41 +118,45 @@ typedef struct s_cub3d
 {
 	mlx_t			*mlx;
 	mlx_image_t		*img;
-	
+
 	t_map			*level;
 	t_player		*player;
 	bool			has_player;
 	bool			crouching;
-	t_texture		*textures;
 	mlx_texture_t	*tex;
 
-	// mlx_texture_t	*north;
-	// mlx_texture_t	*south;
-	// mlx_texture_t	*east;
-	// mlx_texture_t	*west;
 	t_col			ceiling;
 	t_col			floor;
 
+	int				start_of_map;
+	int				end_of_map;
 
-	// char **map;
-	// int scale;
-	int			start_of_map;
-	int			end_of_map;
-
-
-	int			pitch;
-	double		mouse_x;
-	double		mouse_y;
-	char		*title;
+	int				pitch;
+	double			mouse_x;
+	double			mouse_y;
+	int				scale;
+	char			*title;
 }	t_cub3d;
 
 
 void	error_exit(char *msg, int error_code);
-bool	parse_map(char *file, t_cub3d *data);
+void	parse_map(char *file, t_cub3d *data);
 
 int		open_map(char *file, t_cub3d *data);
 
 bool	fill_element(char *str, t_cub3d *data);
+
+//draw
+void	draw_cursor(t_cub3d *data);
+// void	draw_buffer(t_col *buffer, int start, int end, int i, int x, t_cub3d *data);
+void	bad_draw(t_cub3d *data);
+
+//colour
+uint32_t	colour_to_uint(t_col col);
+
+//map
+bool	init_map(char **av, t_cub3d *data);
+
 
 
 //hooks
@@ -171,7 +171,7 @@ void	draw_cursor(t_cub3d *data);
 void	draw_player(t_player *player, t_cub3d *data);
 void	draw_square(int	x, int y, t_cub3d *data, uint32_t color);
 void	bad_draw(t_cub3d *data);
-void	draw_buffer(t_col *buffer, int start, int end, int i, int x, t_cub3d *data);
+void	draw_buffer(t_col *buffer, int x, t_draw *draw, t_cub3d *data);
 
 // ray_setup
 void	setup_ray(t_draw *draw, int x, t_cub3d *data);
