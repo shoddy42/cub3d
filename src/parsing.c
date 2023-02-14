@@ -6,7 +6,7 @@
 /*   By: auzochuk <auzochuk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/30 15:25:30 by auzochuk      #+#    #+#                 */
-/*   Updated: 2023/02/14 08:34:23 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/14 10:11:32 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ bool	init_player(t_cub3d *data)
 
 	data->player = ft_calloc(1, sizeof(t_player));
 	if (!data->player)
-		error_exit("Error: Failed to allocate player\n", 1);
+		error_exit("Error: Failed to allocate player", 1);
 	level = data->level;
 	has_player = false;
 	y = -1;
@@ -70,7 +70,7 @@ bool	init_player(t_cub3d *data)
 				has_player = set_player(data, x, y, level->map[y][x]);
 			else if (ft_charinstr(level->map[y][x], PLAYER_TILES) == true
 				&& has_player == true)
-				error_exit("Error: Map has more than one player.\n", 1);
+				error_exit("Error: Map has more than one player.", 1);
 		}
 	}
 	return (has_player);
@@ -82,7 +82,7 @@ void	parse_map(t_cub3d *data)
 	int		y;
 
 	if (!init_player(data))
-		error_exit("Error: Map has no player.\n", 1);
+		error_exit("Error: Map has no player.", 1);
 	y = -1;
 	while (data->level->map[++y])
 	{

@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/16 15:54:39 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/14 09:39:34 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/14 10:06:51 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,7 @@ uint32_t	colour_to_uint(t_col col);
 bool		init_map(char **av, t_cub3d *data);
 void		parse_map(t_cub3d *data);
 int			open_map(char *file);
-bool		fill_element(char *str, t_cub3d *data);
+bool		fill_element(char *str, t_cub3d *data, bool ret);
 
 //wasd
 void		move_back(t_player *player, char **map, float movespeed);
