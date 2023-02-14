@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/08 19:11:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/13 13:04:46 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/14 08:57:26 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,10 @@ void	init(char **av, t_cub3d *data)
 	if (!data->tex)
 		error_exit("Error: Failed to allocate tex\n", 1);
 	init_map(av, data);
-	parse_map(av[1], data);
+	parse_map(data);
 	data->scale = WIDTH / data->level->width / 4;
 	if (HEIGHT / data->level->height / 2 < data->scale)
 		data->scale = HEIGHT / data->level->height / 2;
-	if (data->scale < 4)
-		data->scale = 4;
 	data->mlx = mlx_init(WIDTH, HEIGHT, av[1], false);
 	if (!data->mlx)
 		error_exit("Error: Failed to allocate mlx instance.\n", 1);

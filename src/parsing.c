@@ -6,7 +6,7 @@
 /*   By: auzochuk <auzochuk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/30 15:25:30 by auzochuk      #+#    #+#                 */
-/*   Updated: 2023/02/13 07:59:14 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/14 08:34:23 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,24 +47,6 @@ void	check_cell(int x, int y, t_map *level)
 		error_exit("Error: Diagonal up left wall not closed.", 1);
 }
 
-//todo: set direction of player depending on NSWE
-bool	set_player(t_cub3d *data, int x, int y)
-{
-	//definitely change
-	data->player->dir[X] = -1;
-	data->player->dir[Y] = 0;
-	data->player->side_dir[X] = 0;
-	data->player->side_dir[Y] = 1;
-	//maybe changes
-	data->player->plane_x = 0;
-	data->player->plane_y = 0.66;
-	//doesnt change
-	data->player->pos[X] = (float)x + 0.5f;
-	data->player->pos[Y] = (float)y + 0.5f;
-	data->level->map[y][x] = '0';
-	return (true);
-}
-
 bool	init_player(t_cub3d *data)
 {
 	bool	has_player;
@@ -85,7 +67,7 @@ bool	init_player(t_cub3d *data)
 		{
 			if (ft_charinstr(level->map[y][x], PLAYER_TILES) == true
 				&& has_player == false)
-				has_player = set_player(data, x, y);
+				has_player = set_player(data, x, y, level->map[y][x]);
 			else if (ft_charinstr(level->map[y][x], PLAYER_TILES) == true
 				&& has_player == true)
 				error_exit("Error: Map has more than one player.\n", 1);
@@ -94,10 +76,8 @@ bool	init_player(t_cub3d *data)
 	return (has_player);
 }
 
-void	parse_map(char *file, t_cub3d *data)
+void	parse_map(t_cub3d *data)
 {
-	char	*line;
-	int		fd;
 	int		x;
 	int		y;
 

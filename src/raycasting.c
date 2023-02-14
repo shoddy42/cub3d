@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/02/08 01:22:25 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/13 12:04:52 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/14 09:12:45 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,13 +81,11 @@ void	tex_setup(t_draw *draw, t_cub3d *data)
 					+ draw->line_height / 2) * draw->step;
 }
 
-	//dunno what & (int)(data->tex->pixels - 1) for tbh, might need?
-	//i think its to prevent overflow, but i dont think that happens for us.
 t_col	get_col(t_draw *draw, t_cub3d *data)
 {
 	t_col		colour;
 
-	draw->tex_y = (int)draw->tex_pos & (int)(data->tex->pixels - 1);
+	draw->tex_y = (int)draw->tex_pos;
 	draw->tex_pos += draw->step;
 	colour.r = (int)data->tex[draw->side].pixels[(data->tex->height
 			* draw->tex_y + draw->tex_x) * data->tex->bytes_per_pixel];
@@ -97,12 +95,12 @@ t_col	get_col(t_draw *draw, t_cub3d *data)
 			* draw->tex_y + draw->tex_x) * data->tex->bytes_per_pixel + 2];
 	colour.a = (int)data->tex[draw->side].pixels[(data->tex->height
 			* draw->tex_y + draw->tex_x) * data->tex->bytes_per_pixel + 3];
-	if (draw->wall_dist > 1)
+	if (draw->wall_dist > 1 && SHADING == 1)
 	{
 		colour.r -= draw->wall_dist * 10;
 		colour.g -= draw->wall_dist * 10;
 		colour.b -= draw->wall_dist * 10;
-		// colour.a -= draw->wall_dist * 10;
+		colour.a -= draw->wall_dist * 5;
 	}
 	return (colour);
 }
@@ -115,7 +113,6 @@ void	draw_3d(t_cub3d *data)
 	int			x;
 	int			y;
 
-	// ft_bzero(data->img->pixels, WIDTH * HEIGHT * sizeof(unsigned int));
 	player = data->player;
 	x = 0;
 	while (x < WIDTH)

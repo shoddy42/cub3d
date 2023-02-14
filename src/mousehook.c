@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/02/13 07:34:16 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/13 12:56:11 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/14 08:14:41 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,11 +78,3 @@ void	cursorhook(double xpos, double ypos, void *param)
 	}
 	mlx_set_mouse_pos(data->mlx, WIDTH / 2, HEIGHT / 2);
 }
-
-// void	mousehook(mouse_key_t button, action_t action,
-// 	modifier_key_t mods, void *param)
-// {
-// 	t_cub3d	*data;
-
-// 	data = param;
-// }

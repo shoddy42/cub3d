@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/02/08 01:21:36 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/13 07:59:14 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/14 08:01:59 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,28 +36,28 @@ void	setup_ray(t_draw *draw, int x, t_cub3d *data)
 void	get_step(t_draw *draw, t_cub3d *data)
 {
 	t_player	*player;
+	t_point2d	delta;
 
+	delta = draw->delta_dist;
 	player = data->player;
 	if (draw->ray_dir[X] < 0)
 	{
 		draw->step_x = -1;
-		draw->side_dist[X] = (player->pos[X] - draw->map_x) * draw->delta_dist[X];
+		draw->side_dist[X] = (player->pos[X] - draw->map_x) * delta[X];
 	}
 	else
 	{
 		draw->step_x = 1;
-		draw->side_dist[X] = (draw->map_x + 1.0 - player->pos[X])
-			* draw->delta_dist[X];
+		draw->side_dist[X] = (draw->map_x + 1.0 - player->pos[X]) * delta[X];
 	}
 	if (draw->ray_dir[Y] < 0)
 	{
 		draw->step_y = -1;
-		draw->side_dist[Y] = (player->pos[Y] - draw->map_y) * draw->delta_dist[Y];
+		draw->side_dist[Y] = (player->pos[Y] - draw->map_y) * delta[Y];
 	}
 	else
 	{
 		draw->step_y = 1;
-		draw->side_dist[Y] = (draw->map_y + 1.0 - player->pos[Y])
-			* draw->delta_dist[Y];
+		draw->side_dist[Y] = (draw->map_y + 1.0 - player->pos[Y]) * delta[Y];
 	}
 }

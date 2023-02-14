@@ -6,7 +6,7 @@
 #    By: wkonings <wkonings@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2023/01/16 15:30:52 by wkonings      #+#    #+#                  #
-#    Updated: 2023/02/13 12:32:40 by wkonings      ########   odam.nl          #
+#    Updated: 2023/02/14 08:57:42 by wkonings      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@
 # ----------------------------------------- #
 
 NAME 	:= cub3d
-FLAGS 	:= #-Wall -Wextra -Werror #//todo: RENABLE FLAGS WHEN HANDING IN FOR THE LOVE OF GOD
+FLAGS 	:= -Wall -Wextra -Werror #//todo: RENABLE FLAGS WHEN HANDING IN FOR THE LOVE OF GOD
 CFLAGS	:= -w -Wunreachable-code -Ofast
 DEBUG 	:= -g #-fsanitize=address
 # LIBS	:= $(LIBMLX_A) $(LIBFT_A)
@@ -52,7 +52,7 @@ INC			:= -I include
 HEADER_FILES:=	cub3d.h
 HEADERS		:=	$(addprefix $(INCLUDE_DIR)/, $(HEADER_FILES))
 
-MAIN_FILES	:= main parsing parsing_utils hooks raycasting ray_setup map colour draw mousehook wasd
+MAIN_FILES	:= main parsing parsing_utils hooks raycasting ray_setup map colour draw mousehook wasd bresenham player
 
 PARSER_FILES:= ##parser parse_objects parse_utils
 
@@ -99,7 +99,6 @@ $(NAME): $(LIBFT_A) $(LIBMLX_A) $(OBJS) $(HEADERS) $(MAKEFILE)
 	@printf "$(YELLOW)$(NAME) compiled!\n$(END)"
 # @make cubed
 
-
 all: $(BANNER) $(NAME)
 
 $(LIBS): $(LIBMLX_A) $(LIBFT_A)
@@ -129,8 +128,8 @@ clean:
 fclean:	clean
 	/bin/rm -f $(NAME)
 	/bin/rm -rf $(BIN_DIR)
-#	@make fclean -C $(LIBFT)
-#	@make fclean -C $(LIBMLX)
+	@make fclean -C $(LIBFT)
+	@make fclean -C $(LIBMLX)
 	@printf "$(L_BLUE)Fully cleaned $(NAME)\n$(END)"
 
 tooclean: clean

@@ -6,16 +6,17 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/16 15:54:39 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/13 12:55:37 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/14 09:39:34 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB3D_H
 # define CUB3D_H
 
-# define WIDTH 2000
-# define HEIGHT 1000
+# define WIDTH 1920
+# define HEIGHT 1080
 # define SCALE 16
+# define SHADING 1
 # define VALID_TILES "01NSWE "
 # define WALL_TILES "1"
 # define PLAYER_TILES "NSWE"
@@ -124,6 +125,7 @@ typedef struct s_cub3d
 	bool			has_player;
 	bool			crouching;
 	mlx_texture_t	*tex;
+	bool			has_tex[6];
 
 	t_col			ceiling;
 	t_col			floor;
@@ -138,54 +140,43 @@ typedef struct s_cub3d
 	char			*title;
 }	t_cub3d;
 
+void		bresenham(t_point2d a, t_point2d b, t_cub3d *data, uint32_t color);
+bool		set_player(t_cub3d *data, int x, int y, char dir);
 
-void	error_exit(char *msg, int error_code);
-void	parse_map(char *file, t_cub3d *data);
-
-int		open_map(char *file, t_cub3d *data);
-
-bool	fill_element(char *str, t_cub3d *data);
-
-//draw
-void	draw_cursor(t_cub3d *data);
-// void	draw_buffer(t_col *buffer, int start, int end, int i, int x, t_cub3d *data);
-void	bad_draw(t_cub3d *data);
+void		error_exit(char *msg, int error_code);
 
 //colour
 uint32_t	colour_to_uint(t_col col);
 
 //map
-bool	init_map(char **av, t_cub3d *data);
+bool		init_map(char **av, t_cub3d *data);
+void		parse_map(t_cub3d *data);
+int			open_map(char *file);
+bool		fill_element(char *str, t_cub3d *data);
 
 //wasd
-void	move_back(t_cub3d *data, t_player *player,
-			char **map, float movespeed);
-void	move_forward(t_cub3d *data, t_player *player,
-			char **map, float movespeed);
-void	move_left(t_cub3d *data, t_player *player,
-			char **map, float movespeed);
-void	move_right(t_cub3d *data, t_player *player,
-			char **map, float movespeed);
+void		move_back(t_player *player, char **map, float movespeed);
+void		move_forward(t_player *player, char **map, float movespeed);
+void		move_left(t_player *player, char **map, float movespeed);
+void		move_right(t_player *player, char **map, float movespeed);
 
 //hooks
-void	keyhook(mlx_key_data_t keydata, void *param);
-void	mousehook(mouse_key_t button, action_t action, modifier_key_t mods, void *param);
-void	cursorhook(double xpos, double ypos, void *param);
-void	kbm_turn_side(t_cub3d *data, int dir);
-void	loophook(void *param);
+void		keyhook(mlx_key_data_t keydata, void *param);
+void		cursorhook(double xpos, double ypos, void *param);
+void		kbm_turn_side(t_cub3d *data, int dir);
+void		loophook(void *param);
 
 //draw
-void	draw_3d(t_cub3d *data);
-void	draw_cursor(t_cub3d *data);
-void	draw_player(t_player *player, t_cub3d *data, int width, int height);
-void	draw_square(int x, int y, t_cub3d *data, uint32_t color);
-void	draw_minimap(t_cub3d *data);
-void	draw_buffer(t_col *buffer, int x, t_draw *draw, t_cub3d *data);
+void		draw_3d(t_cub3d *data);
+void		draw_cursor(t_cub3d *data);
+void		draw_player(t_player *player, t_cub3d *data, int width, int height);
+void		draw_square(int x, int y, t_cub3d *data, uint32_t color);
+void		draw_minimap(t_cub3d *data);
+void		draw_buffer(t_col *buffer, int x, t_draw *draw, t_cub3d *data);
 
 // ray_setup
-void	setup_ray(t_draw *draw, int x, t_cub3d *data);
-void	get_step(t_draw *draw, t_cub3d *data);
-
+void		setup_ray(t_draw *draw, int x, t_cub3d *data);
+void		get_step(t_draw *draw, t_cub3d *data);
 
 //string colors
 # define YELLOW	"\1\33[38;5;220m\2"

@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/02/13 07:21:23 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/02/13 12:04:05 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/02/14 09:53:03 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,9 @@ bool	set_texture(char *str, t_cub3d *data, t_tex_type type)
 		printf (RED "Error. " RESET "Failed to load texture [%s]\n", str);
 		exit (1);
 	}
+	if (data->has_tex[type] == true)
+		error_exit("Duplicate texture in .cub.", 1);
+	data->has_tex[type] = true;
 	data->tex[type] = *tex;
 	free(tex);
 	return (true);
@@ -48,24 +51,24 @@ bool	has_num(char *str)
 bool	set_colour(char *str, t_col *col)
 {
 	if (ft_strcomply(str, " ,0123456789") == false)
-		error_exit("illegal characters!\n", 99);
+		error_exit("Error: illegal characters in colour!", 99);
 	if (has_num(str) == false)
-		error_exit("No red value!\n", -2);
+		error_exit("Error: No red value!\n", -2);
 	col->r = ft_atoi(str);
 	if (col->r > 255 || col->r < 0)
-		error_exit("Red colour must be in range [0 - 255]!\n", 8);
+		error_exit("Error: Red colour must be in range [0 - 255]!", 8);
 	str = ft_strchr(str, ',');
 	if (!str || str[1] == '\0' || has_num(str + 1) == false)
-		error_exit("No green value!\n", 12);
+		error_exit("Error: No green value!\n", 12);
 	col->g = ft_atoi(str + 1);
 	if (col->g > 255 || col->g < 0)
-		error_exit("Green colour must be in range [0 - 255]!\n", 9);
+		error_exit("Error: Green colour must be in range [0 - 255]!", 9);
 	str = ft_strchr(str + 1, ',');
 	if (!str || str[1] == '\0' || has_num(str + 1) == false)
-		error_exit("No blue value!\n", 10);
+		error_exit("Error: No blue value!", 10);
 	col->b = ft_atoi(str + 1);
 	if (col->b > 255 || col->b < 0)
-		error_exit ("Blue colour must be in range [0 - 255]!\n", 11);
+		error_exit ("Error: Blue colour must be in range [0 - 255]!", 11);
 	col->a = 255;
 	return (true);
 }
@@ -89,14 +92,18 @@ bool	fill_element(char *str, t_cub3d *data)
 		test = set_texture(str + 3, data, EAST);
 	if (ft_strncmp(str, "C ", 2) == 0)
 		test = set_colour(str + 2, &data->ceiling);
+	if (ft_strncmp(str, "C ", 2) == 0)
+		data->has_tex[CEILING] = true;
 	if (ft_strncmp(str, "F ", 2) == 0)
 		test = set_colour(str + 2, &data->floor);
+	if (ft_strncmp(str, "F ", 2) == 0)
+		data->has_tex[FLOOR] = true;
 	return (test);
 }
 
-int	open_map(char *file, t_cub3d *data)
+int	open_map(char *file)
 {
-	int		fd;
+	int	fd;
 
 	if (ft_strlen(file) < 4)
 		error_exit(RED "Error: Filename too short!\n", 6);
